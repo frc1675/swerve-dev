@@ -1,18 +1,35 @@
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.*;
+import static frc.robot.Constants.BACK_LEFT_MODULE_DRIVE_MOTOR;
+import static frc.robot.Constants.BACK_LEFT_MODULE_STEER_ENCODER;
+import static frc.robot.Constants.BACK_LEFT_MODULE_STEER_MOTOR;
+import static frc.robot.Constants.BACK_LEFT_MODULE_STEER_OFFSET;
+import static frc.robot.Constants.BACK_RIGHT_MODULE_DRIVE_MOTOR;
+import static frc.robot.Constants.BACK_RIGHT_MODULE_STEER_ENCODER;
+import static frc.robot.Constants.BACK_RIGHT_MODULE_STEER_MOTOR;
+import static frc.robot.Constants.BACK_RIGHT_MODULE_STEER_OFFSET;
+import static frc.robot.Constants.DRIVETRAIN_TRACKWIDTH_METERS;
+import static frc.robot.Constants.DRIVETRAIN_WHEELBASE_METERS;
+import static frc.robot.Constants.FRONT_LEFT_MODULE_DRIVE_MOTOR;
+import static frc.robot.Constants.FRONT_LEFT_MODULE_STEER_ENCODER;
+import static frc.robot.Constants.FRONT_LEFT_MODULE_STEER_MOTOR;
+import static frc.robot.Constants.FRONT_LEFT_MODULE_STEER_OFFSET;
+import static frc.robot.Constants.FRONT_RIGHT_MODULE_DRIVE_MOTOR;
+import static frc.robot.Constants.FRONT_RIGHT_MODULE_STEER_ENCODER;
+import static frc.robot.Constants.FRONT_RIGHT_MODULE_STEER_MOTOR;
+import static frc.robot.Constants.FRONT_RIGHT_MODULE_STEER_OFFSET;
 
 import com.kauailabs.navx.frc.AHRS;
-import com.swervedrivespecialties.swervelib.Mk3SwerveModuleHelper;
+import com.swervedrivespecialties.swervelib.Mk4SwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
 import com.swervedrivespecialties.swervelib.SwerveModule;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.geometry.Translation2d;
-import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -37,8 +54,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
    */
 
   public static final double MAX_VELOCITY_METERS_PER_SECOND = 6380.0 / 60.0 *
-          SdsModuleConfigurations.MK3_STANDARD.getDriveReduction() *
-          SdsModuleConfigurations.MK3_STANDARD.getWheelDiameter() * Math.PI;
+          SdsModuleConfigurations.MK4_L3.getDriveReduction() *
+          SdsModuleConfigurations.MK4_L3.getWheelDiameter() * Math.PI;
   /**
    * The maximum angular velocity of the robot in radians per second.
    * <p>
@@ -71,63 +88,44 @@ public class DrivetrainSubsystem extends SubsystemBase {
   public DrivetrainSubsystem() {
     ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
 
-    // There are 4 methods you can call to create your swerve modules.
-    // The method you use depends on what motors you are using.
-    //
-    // Mk3SwerveModuleHelper.createFalcon500(...)
-    //   Your module has two Falcon 500s on it. One for steering and one for driving.
-    //
-    // Mk3SwerveModuleHelper.createNeo(...)
-    //   Your module has two NEOs on it. One for steering and one for driving.
-    //
-    // Mk3SwerveModuleHelper.createFalcon500Neo(...)
-    //   Your module has a Falcon 500 and a NEO on it. The Falcon 500 is for driving and the NEO is for steering.
-    //
-    // Mk3SwerveModuleHelper.createNeoFalcon500(...)
-    //   Your module has a NEO and a Falcon 500 on it. The NEO is for driving and the Falcon 500 is for steering.
-    //
-    // Similar helpers also exist for Mk4 modules using the Mk4SwerveModuleHelper class.
-
-    // By default we will use Falcon 500s in standard configuration. But if you use a different configuration or motors
-    // you MUST change it. If you do not, your code will crash on startup.
-    m_frontLeftModule = Mk3SwerveModuleHelper.createNeo(
+    m_frontLeftModule = Mk4SwerveModuleHelper.createNeo(
             tab.getLayout("Front Left Module", BuiltInLayouts.kList)
                 .withSize(2, 4)
                 .withPosition(0, 0),
-            Mk3SwerveModuleHelper.GearRatio.STANDARD,
+            Mk4SwerveModuleHelper.GearRatio.L3,
              FRONT_LEFT_MODULE_DRIVE_MOTOR,
              FRONT_LEFT_MODULE_STEER_MOTOR,
              FRONT_LEFT_MODULE_STEER_ENCODER,
              FRONT_LEFT_MODULE_STEER_OFFSET
         );
 
-    m_frontRightModule = Mk3SwerveModuleHelper.createNeo(
+    m_frontRightModule = Mk4SwerveModuleHelper.createNeo(
             tab.getLayout("Front Right Module", BuiltInLayouts.kList)
                     .withSize(2, 4)
                     .withPosition(2, 0),
-            Mk3SwerveModuleHelper.GearRatio.STANDARD,
+            Mk4SwerveModuleHelper.GearRatio.L3,
             FRONT_RIGHT_MODULE_DRIVE_MOTOR,
             FRONT_RIGHT_MODULE_STEER_MOTOR,
             FRONT_RIGHT_MODULE_STEER_ENCODER,
             FRONT_RIGHT_MODULE_STEER_OFFSET
     );
 
-    m_backLeftModule = Mk3SwerveModuleHelper.createNeo(
+    m_backLeftModule = Mk4SwerveModuleHelper.createNeo(
             tab.getLayout("Back Left Module", BuiltInLayouts.kList)
                     .withSize(2, 4)
                     .withPosition(4, 0),
-            Mk3SwerveModuleHelper.GearRatio.STANDARD,
+            Mk4SwerveModuleHelper.GearRatio.L3,
             BACK_LEFT_MODULE_DRIVE_MOTOR,
             BACK_LEFT_MODULE_STEER_MOTOR,
             BACK_LEFT_MODULE_STEER_ENCODER,
             BACK_LEFT_MODULE_STEER_OFFSET
     );
 
-    m_backRightModule = Mk3SwerveModuleHelper.createNeo(
+    m_backRightModule = Mk4SwerveModuleHelper.createNeo(
             tab.getLayout("Back Right Module", BuiltInLayouts.kList)
                     .withSize(2, 4)
                     .withPosition(6, 0),
-            Mk3SwerveModuleHelper.GearRatio.STANDARD,
+            Mk4SwerveModuleHelper.GearRatio.L3,
             BACK_RIGHT_MODULE_DRIVE_MOTOR,
             BACK_RIGHT_MODULE_STEER_MOTOR,
             BACK_RIGHT_MODULE_STEER_ENCODER,
@@ -155,7 +153,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(m_chassisSpeeds);
-    SwerveDriveKinematics.normalizeWheelSpeeds(states, MAX_VELOCITY_METERS_PER_SECOND);
+    SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_VELOCITY_METERS_PER_SECOND);
 
     m_frontLeftModule.set(states[0].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[0].angle.getRadians());
     m_frontRightModule.set(states[1].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[1].angle.getRadians());
