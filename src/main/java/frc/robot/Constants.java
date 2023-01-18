@@ -2,8 +2,8 @@ package frc.robot;
 
 public final class Constants {
     public static final int DRIVER_CONTROLLER = 0;
-    public static final double DRIVETRAIN_TRACKWIDTH_METERS = 0.599; //Measured in cad
-    public static final double DRIVETRAIN_WHEELBASE_METERS = 0.601; //Mesasured in cad
+    public static final double DRIVETRAIN_TRACKWIDTH_METERS = 0.5969; //Measured on robot
+    public static final double DRIVETRAIN_WHEELBASE_METERS = 0.5969;
 
     public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 3;
     public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 4;
