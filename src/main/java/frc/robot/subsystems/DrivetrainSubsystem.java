@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class DrivetrainSubsystem extends SubsystemBase {
   public static final double MAX_VOLTAGE = 12;
@@ -149,5 +150,21 @@ public class DrivetrainSubsystem extends SubsystemBase {
     m_frontRightModule.set(states[1].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[1].angle.getRadians());
     m_backLeftModule.set(states[2].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[2].angle.getRadians());
     m_backRightModule.set(states[3].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE, states[3].angle.getRadians());
+  }
+
+  public void rotate(boolean directionIsRight, double radiansPerSecond) {
+          if(directionIsRight) {
+                  drive(new ChassisSpeeds(0, 0, -radiansPerSecond));
+          }else {
+                drive(new ChassisSpeeds(0, 0, radiansPerSecond));
+          }
+  }
+
+  public void rotate(boolean directionIsRight) {
+        rotate(directionIsRight, Constants.DEFAULT_RADIANS_PER_SECOND);
+  }
+
+  public void rotate() {
+        drive(new ChassisSpeeds(0, 0, 0));
   }
 }
