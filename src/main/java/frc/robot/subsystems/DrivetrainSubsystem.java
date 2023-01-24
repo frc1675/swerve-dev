@@ -163,8 +163,5 @@ public class DrivetrainSubsystem extends SubsystemBase {
   public void rotate(boolean directionIsRight) {
         rotate(directionIsRight, Constants.DEFAULT_RADIANS_PER_SECOND);
   }
-
-  public void rotate() {
-        drive(new ChassisSpeeds(0, 0, 0));
-  }
+  
 }
