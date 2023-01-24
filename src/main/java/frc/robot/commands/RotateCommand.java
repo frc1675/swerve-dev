@@ -1,11 +1,9 @@
 package frc.robot.commands;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.DrivetrainSubsystem;
@@ -13,10 +11,9 @@ import frc.robot.subsystems.DrivetrainSubsystem;
 public class RotateCommand extends CommandBase{
     private DrivetrainSubsystem drive;
     private Rotation2d target;
+    private boolean rotationDirection;
 
-    private final ShuffleboardTab tab = Shuffleboard.getTab("Tab 4");
-    private final NetworkTableEntry netTableDiff = tab.add("Diff", 0).withWidget(BuiltInWidgets.kTextView).getEntry();
-    private final NetworkTableEntry withinOffsets = tab.add("Within offsets", false).withWidget(BuiltInWidgets.kTextView).getEntry();
+    private PIDController pid = new PIDController(3, 0.5, 1);
 
     public RotateCommand(DrivetrainSubsystem drive, Rotation2d target) {
         this.drive = drive;
@@ -26,19 +23,11 @@ public class RotateCommand extends CommandBase{
 
     @Override 
     public void initialize() {
-        Rotation2d diff;
-        if(RobotBase.isSimulation()) {
-            diff = drive.getGyroscopeRotation().minus(new Rotation2d(15));
-        }else {
-            diff = drive.getGyroscopeRotation().minus(target);
-        }
-
-        netTableDiff.setDouble(diff.getDegrees());
-
+        Rotation2d diff = drive.getGyroscopeRotation().minus(target);
         if(diff.getDegrees() < 0) {
-            drive.rotate(true);
+            rotationDirection = true;
         }else {
-            drive.rotate(false);
+            rotationDirection = false;
         }
     }
 
@@ -61,12 +50,13 @@ public class RotateCommand extends CommandBase{
 
     @Override
     public void execute() {
-        withinOffsets.setBoolean(withinAcceptableOffset());
+        SmartDashboard.putNumber("radians away", drive.getGyroscopeRotation().minus(target).getRadians());
+        drive.rotate(rotationDirection, pid.calculate(Math.abs(drive.getGyroscopeRotation().minus(target).getRadians())) * -1);
     }
 
     @Override 
     public void end(boolean interrupted) {
-        drive.rotate();
+        drive.drive(new ChassisSpeeds(0, 0, 0));
     }
 }
 
