@@ -1,10 +1,12 @@
 package frc.robot.commands;
 
+import java.util.function.DoubleSupplier;
+
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DrivetrainSubsystem;
-
-import java.util.function.DoubleSupplier;
 
 public class DefaultDriveCommand extends CommandBase {
     private final DrivetrainSubsystem m_drivetrainSubsystem;
@@ -13,10 +15,12 @@ public class DefaultDriveCommand extends CommandBase {
     private final DoubleSupplier m_translationYSupplier;
     private final DoubleSupplier m_rotationSupplier;
 
-    public DefaultDriveCommand(DrivetrainSubsystem drivetrainSubsystem,
-                               DoubleSupplier translationXSupplier,
-                               DoubleSupplier translationYSupplier,
-                               DoubleSupplier rotationSupplier) {
+    private final PIDController pid = new PIDController(3, 0.5, 0.5);
+    private Rotation2d target;
+    private boolean updateTarget = true;
+
+    public DefaultDriveCommand(DrivetrainSubsystem drivetrainSubsystem, DoubleSupplier translationXSupplier,
+            DoubleSupplier translationYSupplier, DoubleSupplier rotationSupplier) {
         this.m_drivetrainSubsystem = drivetrainSubsystem;
         this.m_translationXSupplier = translationXSupplier;
         this.m_translationYSupplier = translationYSupplier;
@@ -27,15 +31,26 @@ public class DefaultDriveCommand extends CommandBase {
 
     @Override
     public void execute() {
-        // You can use `new ChassisSpeeds(...)` for robot-oriented movement instead of field-oriented movement
-        m_drivetrainSubsystem.drive(
-                ChassisSpeeds.fromFieldRelativeSpeeds(
-                        m_translationXSupplier.getAsDouble(),
-                        m_translationYSupplier.getAsDouble(),
-                        m_rotationSupplier.getAsDouble(),
-                        m_drivetrainSubsystem.getGyroscopeRotation()
-                )
-        );
+        if (m_rotationSupplier.getAsDouble() == 0 && (m_translationXSupplier.getAsDouble() != 0 || m_translationYSupplier.getAsDouble() != 0)) {
+            if (updateTarget) {
+                target = m_drivetrainSubsystem.getGyroscopeRotation();
+                updateTarget = false;
+            }
+            m_drivetrainSubsystem.drive(
+                    ChassisSpeeds.fromFieldRelativeSpeeds(
+                            m_translationXSupplier.getAsDouble(),
+                            m_translationYSupplier.getAsDouble(),
+                            -pid.calculate(m_drivetrainSubsystem.getGyroscopeRotation().minus(target).getRadians()),
+                            m_drivetrainSubsystem.getGyroscopeRotation()));
+        } else {
+            updateTarget = true;
+            m_drivetrainSubsystem.drive(
+                    ChassisSpeeds.fromFieldRelativeSpeeds(
+                            m_translationXSupplier.getAsDouble(),
+                            m_translationYSupplier.getAsDouble(),
+                            m_rotationSupplier.getAsDouble(),
+                            m_drivetrainSubsystem.getGyroscopeRotation()));
+        }
     }
 
     @Override
