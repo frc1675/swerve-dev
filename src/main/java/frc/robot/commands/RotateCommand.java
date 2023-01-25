@@ -13,7 +13,7 @@ public class RotateCommand extends CommandBase{
     private Rotation2d target;
     private boolean rotationDirection;
 
-    private PIDController pid = new PIDController(3, 0.5, 1);
+    private PIDController pid = new PIDController(3, 0.5, 0.5);
 
     public RotateCommand(DrivetrainSubsystem drive, Rotation2d target) {
         this.drive = drive;
