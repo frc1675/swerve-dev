@@ -157,4 +157,8 @@ public class DrivetrainSubsystem extends SubsystemBase {
 
     rotation.setNumber(getGyroscopeRotation().getDegrees());
   }
+
+  public void rotate(double radiansPerSecond) {
+          drive(new ChassisSpeeds(0, 0, radiansPerSecond));
+  }
 }
