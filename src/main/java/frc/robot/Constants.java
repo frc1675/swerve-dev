@@ -4,8 +4,11 @@ public final class Constants {
     public static final double DRIVETRAIN_TRACKWIDTH_METERS = 0.5969; //Measured on robot
     public static final double DRIVETRAIN_WHEELBASE_METERS = 0.5969;
 
-    public static final double DEFAULT_RADIANS_PER_SECOND = 3.0;
-    public static final double ACCEPTABLE_AUTOROTATE_ERROR_DEGREES = 3.0;
+    public static final double DRIVE_ROTATE_TOLERANCE_DEGREES = 1.0;
+
+    public static final double PROPORTIONAL_COEFFICENT = 3.0;
+    public static final double INTEGRAL_COEFFICENT = 0.5;
+    public static final double DERIVATIVE_COEFFICENT = 0.5;
 
     public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 3;
     public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 4;
