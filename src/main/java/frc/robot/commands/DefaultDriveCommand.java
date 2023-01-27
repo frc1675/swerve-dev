@@ -32,20 +32,25 @@ public class DefaultDriveCommand extends CommandBase {
 
     @Override
     public void execute() {
-        if (m_rotationSupplier.getAsDouble() == 0) {
-            if (updateTarget) {
-                target = m_drivetrainSubsystem.getGyroscopeRotation();
-                updateTarget = false;
-            } 
-        } else {
-            updateTarget = true;
-        }
+        updateTarget();
         m_drivetrainSubsystem.drive(
                 ChassisSpeeds.fromFieldRelativeSpeeds(
                         m_translationXSupplier.getAsDouble(),
                         m_translationYSupplier.getAsDouble(),
                         getRotation(),
                         m_drivetrainSubsystem.getGyroscopeRotation()));
+    }
+
+    private void updateTarget() {
+        if(m_rotationSupplier.getAsDouble() == 0) {
+            if (updateTarget) {
+                target = m_drivetrainSubsystem.getGyroscopeRotation();
+                updateTarget = false;
+            }
+        }else {
+            updateTarget = true;
+        }
+        
     }
 
     private double getRotation() {
