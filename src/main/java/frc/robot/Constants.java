@@ -24,4 +24,8 @@ public final class Constants {
     public static final int BACK_RIGHT_MODULE_STEER_MOTOR = 6; 
     public static final int BACK_RIGHT_MODULE_STEER_ENCODER = 9; 
     public static final double BACK_RIGHT_MODULE_STEER_OFFSET = -Math.toRadians(314.47);
+
+    public static final double PROPORTIONAL_COEFFICENT = 3.0;
+    public static final double INTEGRAL_COEFFICENT = 0.5;
+    public static final double DERIVATIVE_COEFFICENT = 0.5;
 }

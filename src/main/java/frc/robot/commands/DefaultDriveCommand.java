@@ -6,6 +6,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.DrivetrainSubsystem;
 
 public class DefaultDriveCommand extends CommandBase {
@@ -15,7 +16,7 @@ public class DefaultDriveCommand extends CommandBase {
     private final DoubleSupplier m_translationYSupplier;
     private final DoubleSupplier m_rotationSupplier;
 
-    private final PIDController pid = new PIDController(3, 0.5, 0.5);
+    private final PIDController pid = new PIDController(Constants.PROPORTIONAL_COEFFICENT, Constants.INTEGRAL_COEFFICENT, Constants.DERIVATIVE_COEFFICENT);
     private Rotation2d target;
     private boolean updateTarget = true;
 
@@ -31,25 +32,27 @@ public class DefaultDriveCommand extends CommandBase {
 
     @Override
     public void execute() {
-        if (m_rotationSupplier.getAsDouble() == 0 && (m_translationXSupplier.getAsDouble() != 0 || m_translationYSupplier.getAsDouble() != 0)) {
+        if (m_rotationSupplier.getAsDouble() == 0) {
             if (updateTarget) {
                 target = m_drivetrainSubsystem.getGyroscopeRotation();
                 updateTarget = false;
-            }
-            m_drivetrainSubsystem.drive(
-                    ChassisSpeeds.fromFieldRelativeSpeeds(
-                            m_translationXSupplier.getAsDouble(),
-                            m_translationYSupplier.getAsDouble(),
-                            -pid.calculate(m_drivetrainSubsystem.getGyroscopeRotation().minus(target).getRadians()),
-                            m_drivetrainSubsystem.getGyroscopeRotation()));
+            } 
         } else {
             updateTarget = true;
-            m_drivetrainSubsystem.drive(
-                    ChassisSpeeds.fromFieldRelativeSpeeds(
-                            m_translationXSupplier.getAsDouble(),
-                            m_translationYSupplier.getAsDouble(),
-                            m_rotationSupplier.getAsDouble(),
-                            m_drivetrainSubsystem.getGyroscopeRotation()));
+        }
+        m_drivetrainSubsystem.drive(
+                ChassisSpeeds.fromFieldRelativeSpeeds(
+                        m_translationXSupplier.getAsDouble(),
+                        m_translationYSupplier.getAsDouble(),
+                        getRotation(),
+                        m_drivetrainSubsystem.getGyroscopeRotation()));
+    }
+
+    private double getRotation() {
+        if (m_rotationSupplier.getAsDouble() == 0 && (m_translationXSupplier.getAsDouble() != 0 || m_translationYSupplier.getAsDouble() != 0) && target != null) {
+            return -pid.calculate(m_drivetrainSubsystem.getGyroscopeRotation().minus(target).getRadians());
+        } else {
+            return m_rotationSupplier.getAsDouble();
         }
     }
 
