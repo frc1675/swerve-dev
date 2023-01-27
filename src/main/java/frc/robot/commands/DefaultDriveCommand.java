@@ -10,22 +10,23 @@ import frc.robot.Constants;
 import frc.robot.subsystems.DrivetrainSubsystem;
 
 public class DefaultDriveCommand extends CommandBase {
-    private final DrivetrainSubsystem m_drivetrainSubsystem;
+    private final DrivetrainSubsystem drivetrainSubsystem;
 
-    private final DoubleSupplier m_translationXSupplier;
-    private final DoubleSupplier m_translationYSupplier;
-    private final DoubleSupplier m_rotationSupplier;
+    private final DoubleSupplier translationXSupplier;
+    private final DoubleSupplier translationYSupplier;
+    private final DoubleSupplier rotationSupplier;
 
-    private final PIDController pid = new PIDController(Constants.PROPORTIONAL_COEFFICENT, Constants.INTEGRAL_COEFFICENT, Constants.DERIVATIVE_COEFFICENT);
+    private final PIDController pid = new PIDController(Constants.PROPORTIONAL_COEFFICENT,
+            Constants.INTEGRAL_COEFFICENT, Constants.DERIVATIVE_COEFFICENT);
     private Rotation2d target;
     private boolean updateTarget = true;
 
     public DefaultDriveCommand(DrivetrainSubsystem drivetrainSubsystem, DoubleSupplier translationXSupplier,
             DoubleSupplier translationYSupplier, DoubleSupplier rotationSupplier) {
-        this.m_drivetrainSubsystem = drivetrainSubsystem;
-        this.m_translationXSupplier = translationXSupplier;
-        this.m_translationYSupplier = translationYSupplier;
-        this.m_rotationSupplier = rotationSupplier;
+        this.drivetrainSubsystem = drivetrainSubsystem;
+        this.translationXSupplier = translationXSupplier;
+        this.translationYSupplier = translationYSupplier;
+        this.rotationSupplier = rotationSupplier;
 
         addRequirements(drivetrainSubsystem);
     }
@@ -33,36 +34,38 @@ public class DefaultDriveCommand extends CommandBase {
     @Override
     public void execute() {
         updateTarget();
-        m_drivetrainSubsystem.drive(
+        drivetrainSubsystem.drive(
                 ChassisSpeeds.fromFieldRelativeSpeeds(
-                        m_translationXSupplier.getAsDouble(),
-                        m_translationYSupplier.getAsDouble(),
+                        translationXSupplier.getAsDouble(),
+                        translationYSupplier.getAsDouble(),
                         getRotation(),
-                        m_drivetrainSubsystem.getGyroscopeRotation()));
+                        drivetrainSubsystem.getGyroscopeRotation()));
     }
 
     private void updateTarget() {
-        if(m_rotationSupplier.getAsDouble() == 0) {
+        if (rotationSupplier.getAsDouble() == 0) {
             if (updateTarget) {
-                target = m_drivetrainSubsystem.getGyroscopeRotation();
+                target = drivetrainSubsystem.getGyroscopeRotation();
                 updateTarget = false;
             }
-        }else {
+        } else {
             updateTarget = true;
         }
-        
+
     }
 
     private double getRotation() {
-        if (m_rotationSupplier.getAsDouble() == 0 && (m_translationXSupplier.getAsDouble() != 0 || m_translationYSupplier.getAsDouble() != 0) && target != null) {
-            return -pid.calculate(m_drivetrainSubsystem.getGyroscopeRotation().minus(target).getRadians());
+        if (rotationSupplier.getAsDouble() == 0
+                && (translationXSupplier.getAsDouble() != 0 || translationYSupplier.getAsDouble() != 0)
+                && target != null) {
+            return -pid.calculate(drivetrainSubsystem.getGyroscopeRotation().minus(target).getRadians());
         } else {
-            return m_rotationSupplier.getAsDouble();
+            return rotationSupplier.getAsDouble();
         }
     }
 
     @Override
     public void end(boolean interrupted) {
-        m_drivetrainSubsystem.drive(new ChassisSpeeds(0.0, 0.0, 0.0));
+        drivetrainSubsystem.drive(new ChassisSpeeds(0.0, 0.0, 0.0));
     }
 }
