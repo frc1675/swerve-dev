@@ -2,22 +2,26 @@ package frc.robot;
 
 import java.util.Map;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.Button;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.DefaultDriveCommand;
+import frc.robot.commands.RotateCommand;
 import frc.robot.subsystems.DrivetrainSubsystem;
 
 public class RobotContainer {
 
   private final DrivetrainSubsystem m_drivetrainSubsystem = new DrivetrainSubsystem();
 
-  private final XboxController m_controller = new XboxController(Constants.DRIVER_CONTROLLER);
+  private final Joystick m_controller = new Joystick(Constants.DRIVER_CONTROLLER);
+  private final JoystickButton aButton = new JoystickButton(m_controller, Constants.A_BUTTON);
+  private final JoystickButton backButton = new JoystickButton(m_controller, Constants.BACK_BUTTON);
 
   private final ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
 
@@ -42,23 +46,24 @@ public class RobotContainer {
   .getEntry();
 
   public RobotContainer() {
+    configureButtonBindings();
+  }
+
+  private void configureButtonBindings() {
     // The controls are for field-oriented driving:
     // Left stick Y axis -> forward and backwards movement
     // Left stick X axis -> left and right movement
     // Right stick X axis -> rotation
     m_drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
             m_drivetrainSubsystem,
-            () -> -modifyAxis(m_controller.getLeftY()) * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND * leftYScaler.getDouble(1.0),
-            () -> -modifyAxis(m_controller.getLeftX()) * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND * leftXScaler.getDouble(1.0),
-            () -> -modifyAxis(m_controller.getRightX()) * DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND * rightXScaler.getDouble(1.0)
+            () -> -modifyAxis(m_controller.getRawAxis(Constants.LEFT_Y_AXIS)) * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND * leftYScaler.getDouble(1.0),
+            () -> -modifyAxis(m_controller.getRawAxis(Constants.LEFT_X_AXIS)) * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND * leftXScaler.getDouble(1.0),
+            () -> -modifyAxis(m_controller.getRawAxis(Constants.RIGHT_X_AXIS)) * DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND * rightXScaler.getDouble(1.0)
     ));
 
-    configureButtonBindings();
-  }
-
-  private void configureButtonBindings() {
-    new Button(m_controller::getBackButton).whenPressed(m_drivetrainSubsystem::zeroGyroscope);
-  }
+    backButton.whenPressed(m_drivetrainSubsystem::zeroGyroscope);
+    aButton.whenHeld(new RotateCommand(m_drivetrainSubsystem, new Rotation2d(0)));
+    }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
