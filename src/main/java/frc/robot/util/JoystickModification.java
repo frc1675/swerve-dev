@@ -1,50 +1,17 @@
 package frc.robot.util;
 
-import java.util.Map;
-
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.networktables.DoubleSubscriber;
+import edu.wpi.first.networktables.DoubleTopic;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
 public class JoystickModification {
+  private static NetworkTable table = NetworkTableInstance.getDefault().getTable("Drivetrain");
+  private static DoubleTopic topic = table.getDoubleTopic("Speed scaler");
+  private static DoubleSubscriber speedScaler = topic.subscribe(1);
 
-  private static ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
-
-  private static NetworkTableEntry speedScaler = tab.add("Speed scaler", 1)
-      .withWidget(BuiltInWidgets.kNumberSlider)
-      .withProperties(Map.of("min", 0.1, "max", 1, "block increment", 0.1))
-      .getEntry();
-
-  private static NetworkTableEntry leftXScaler = tab.add("X Translation Scaler", 1)
-      .withWidget(BuiltInWidgets.kNumberSlider)
-      .withProperties(Map.of("min", 0, "max", 1, "block increment", 0.1))
-      .getEntry();
-
-  private static NetworkTableEntry leftYScaler = tab.add("Y Translation Scaler", 1)
-      .withWidget(BuiltInWidgets.kNumberSlider)
-      .withProperties(Map.of("min", 0, "max", 1, "block increment", 0.1))
-      .getEntry();
-
-  private static NetworkTableEntry rightXScaler = tab.add("Rotation Scaler", 1)
-      .withWidget(BuiltInWidgets.kNumberSlider)
-      .withProperties(Map.of("min", 0, "max", 1, "block increment", 0.1))
-      .getEntry();
-
-  public static double getSpeedScaler(double defaultValue) {
-    return speedScaler.getDouble(defaultValue);
-  }
-
-  public static double getRightXScaler(double defaultValue) {
-    return rightXScaler.getDouble(defaultValue);
-  }
-
-  public static double getLeftYScaler(double defaultValue) {
-    return leftYScaler.getDouble(defaultValue);
-  }
-
-  public static double getLeftXScaler(double defaultValue) {
-    return leftXScaler.getDouble(defaultValue);
+  public static double getSpeedScaler() {
+    return speedScaler.get();
   }
 
   public static double deadband(double value, double deadband) {
@@ -62,7 +29,7 @@ public class JoystickModification {
   public static double modifyAxis(double value) {
     value = deadband(value, 0.05);
     value = Math.copySign(value * value, value);
-    double scaler = speedScaler.getDouble(1.0);
+    double scaler = speedScaler.get();
     value = value * scaler; // scale down value to slow robot
 
     return value;

@@ -1,15 +1,17 @@
 package frc.robot;
 
 public final class Constants {
+    //drivetrain constants
     public static final double DRIVETRAIN_TRACKWIDTH_METERS = 0.5969; //Measured on robot
     public static final double DRIVETRAIN_WHEELBASE_METERS = 0.5969;
-
     public static final double DRIVE_ROTATE_TOLERANCE_DEGREES = 1.0;
 
+    //PID constants
     public static final double PROPORTIONAL_COEFFICENT = 3.0;
     public static final double INTEGRAL_COEFFICENT = 0.5;
     public static final double DERIVATIVE_COEFFICENT = 0.5;
 
+    //swerve module constants
     public static final int FRONT_LEFT_MODULE_DRIVE_MOTOR = 3;
     public static final int FRONT_LEFT_MODULE_STEER_MOTOR = 4;
     public static final int FRONT_LEFT_MODULE_STEER_ENCODER = 12; 
