@@ -25,13 +25,13 @@ public class RobotContainer {
   private void configureButtonBindings() {
     drivetrainSubsystem.setDefaultCommand(new DefaultDriveCommand(
             drivetrainSubsystem,
-            () -> -JoystickModification.modifyAxis(driverController.getRawAxis(Constants.LEFT_Y_AXIS)) * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND * JoystickModification.getLeftYScaler(1.0),
-            () -> -JoystickModification.modifyAxis(driverController.getRawAxis(Constants.LEFT_X_AXIS)) * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND * JoystickModification.getLeftXScaler(1.0),
-            () -> -JoystickModification.modifyAxis(driverController.getRawAxis(Constants.RIGHT_X_AXIS)) * DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND * JoystickModification.getRightXScaler(1.0)
+            () -> -JoystickModification.modifyAxis(driverController.getRawAxis(Constants.LEFT_Y_AXIS)) * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND,
+            () -> -JoystickModification.modifyAxis(driverController.getRawAxis(Constants.LEFT_X_AXIS)) * DrivetrainSubsystem.MAX_VELOCITY_METERS_PER_SECOND,
+            () -> -JoystickModification.modifyAxis(driverController.getRawAxis(Constants.RIGHT_X_AXIS)) * DrivetrainSubsystem.MAX_ANGULAR_VELOCITY_RADIANS_PER_SECOND
     ));
 
-    backButton.whenPressed(drivetrainSubsystem::zeroGyroscope);
-    aButton.whenHeld(new RotateCommand(drivetrainSubsystem, new Rotation2d(0)));
+    backButton.onTrue(new InstantCommand(drivetrainSubsystem::zeroGyroscope));
+    aButton.whileTrue(new RotateCommand(drivetrainSubsystem, new Rotation2d(0)));
     }
 
   public Command getAutonomousCommand() {
