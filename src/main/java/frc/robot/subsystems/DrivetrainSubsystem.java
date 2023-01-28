@@ -8,6 +8,7 @@ import static frc.robot.Constants.BACK_RIGHT_MODULE_DRIVE_MOTOR;
 import static frc.robot.Constants.BACK_RIGHT_MODULE_STEER_ENCODER;
 import static frc.robot.Constants.BACK_RIGHT_MODULE_STEER_MOTOR;
 import static frc.robot.Constants.BACK_RIGHT_MODULE_STEER_OFFSET;
+import static frc.robot.Constants.DEFAULT_NETWORK_TABLE_INSTANCE;
 import static frc.robot.Constants.DRIVETRAIN_TRACKWIDTH_METERS;
 import static frc.robot.Constants.DRIVETRAIN_WHEELBASE_METERS;
 import static frc.robot.Constants.FRONT_LEFT_MODULE_DRIVE_MOTOR;
@@ -29,7 +30,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.DoublePublisher;
+import edu.wpi.first.networktables.DoubleTopic;
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -61,14 +64,14 @@ public class DrivetrainSubsystem extends SubsystemBase {
         private final SwerveModule backLeftModule;
         private final SwerveModule backRightModule;
 
-        private NetworkTableEntry rotation;
+        private NetworkTable table = DEFAULT_NETWORK_TABLE_INSTANCE.getTable("Drivetrain");
+        private DoubleTopic topic = table.getDoubleTopic("Gyro Rotation");
+        private DoublePublisher rotation = topic.publish();
 
         private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0.0, 0.0, 0.0);
 
         public DrivetrainSubsystem() {
                 ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
-
-                rotation = tab.add("Gyro Rotation", getGyroscopeRotation().getDegrees()).getEntry();
 
                 frontLeftModule = Mk4SwerveModuleHelper.createNeo(
                                 tab.getLayout("Front Left Module", BuiltInLayouts.kList)
@@ -142,7 +145,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
                 backRightModule.set(states[3].speedMetersPerSecond / MAX_VELOCITY_METERS_PER_SECOND * MAX_VOLTAGE,
                                 states[3].angle.getRadians());
 
-                rotation.setNumber(getGyroscopeRotation().getDegrees());
+                rotation.set(getGyroscopeRotation().getDegrees());
         }
 
         public void rotate(double radiansPerSecond) {

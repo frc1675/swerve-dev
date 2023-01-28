@@ -1,6 +1,11 @@
 package frc.robot;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
+
 public final class Constants {
+    //shuffleboard consants:
+    public static final NetworkTableInstance DEFAULT_NETWORK_TABLE_INSTANCE = NetworkTableInstance.getDefault();
+
     //drivetrain constants
     public static final double DRIVETRAIN_TRACKWIDTH_METERS = 0.5969; //Measured on robot
     public static final double DRIVETRAIN_WHEELBASE_METERS = 0.5969;
