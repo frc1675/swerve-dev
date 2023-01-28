@@ -1,25 +1,6 @@
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.BACK_LEFT_MODULE_DRIVE_MOTOR;
-import static frc.robot.Constants.BACK_LEFT_MODULE_STEER_ENCODER;
-import static frc.robot.Constants.BACK_LEFT_MODULE_STEER_MOTOR;
-import static frc.robot.Constants.BACK_LEFT_MODULE_STEER_OFFSET;
-import static frc.robot.Constants.BACK_RIGHT_MODULE_DRIVE_MOTOR;
-import static frc.robot.Constants.BACK_RIGHT_MODULE_STEER_ENCODER;
-import static frc.robot.Constants.BACK_RIGHT_MODULE_STEER_MOTOR;
-import static frc.robot.Constants.BACK_RIGHT_MODULE_STEER_OFFSET;
-import static frc.robot.Constants.DEFAULT_NETWORK_TABLE_INSTANCE;
-import static frc.robot.Constants.DRIVETRAIN_TRACKWIDTH_METERS;
-import static frc.robot.Constants.DRIVETRAIN_WHEELBASE_METERS;
-import static frc.robot.Constants.FRONT_LEFT_MODULE_DRIVE_MOTOR;
-import static frc.robot.Constants.FRONT_LEFT_MODULE_STEER_ENCODER;
-import static frc.robot.Constants.FRONT_LEFT_MODULE_STEER_MOTOR;
-import static frc.robot.Constants.FRONT_LEFT_MODULE_STEER_OFFSET;
-import static frc.robot.Constants.FRONT_RIGHT_MODULE_DRIVE_MOTOR;
-import static frc.robot.Constants.FRONT_RIGHT_MODULE_STEER_ENCODER;
-import static frc.robot.Constants.FRONT_RIGHT_MODULE_STEER_MOTOR;
-import static frc.robot.Constants.FRONT_RIGHT_MODULE_STEER_OFFSET;
-
+import static frc.robot.Constants.*;
 import com.kauailabs.navx.frc.AHRS;
 import com.swervedrivespecialties.swervelib.Mk4SwerveModuleHelper;
 import com.swervedrivespecialties.swervelib.SdsModuleConfigurations;
@@ -33,6 +14,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.DoublePublisher;
 import edu.wpi.first.networktables.DoubleTopic;
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -64,7 +46,7 @@ public class DrivetrainSubsystem extends SubsystemBase {
         private final SwerveModule backLeftModule;
         private final SwerveModule backRightModule;
 
-        private NetworkTable table = DEFAULT_NETWORK_TABLE_INSTANCE.getTable("Drivetrain");
+        private NetworkTable table = NetworkTableInstance.getDefault().getTable("Drivetrain");
         private DoubleTopic topic = table.getDoubleTopic("Gyro Rotation");
         private DoublePublisher rotation = topic.publish();
 

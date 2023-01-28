@@ -3,10 +3,10 @@ package frc.robot.util;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.DoubleTopic;
 import edu.wpi.first.networktables.NetworkTable;
-import frc.robot.Constants;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
 public class JoystickModification {
-  private static NetworkTable table = Constants.DEFAULT_NETWORK_TABLE_INSTANCE.getTable("Drivetrain");
+  private static NetworkTable table = NetworkTableInstance.getDefault().getTable("Drivetrain");
   private static DoubleTopic topic = table.getDoubleTopic("Speed scaler");
   private static DoubleSubscriber speedScaler = topic.subscribe(1);
 
